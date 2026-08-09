@@ -168,7 +168,10 @@ export interface Section1Item {
   char: string;
   step1Val: number;
   step2Val: number;
-  step3Val: number;
+  step3Fraction: Fraction;
+  step3Display: string;
+  step4Fraction: Fraction;
+  step4Display: string;
   ratioFraction: Fraction;
   ratioDisplay: string;
   resultFraction: Fraction;
@@ -198,8 +201,6 @@ export interface CalculationResult {
   transferredSumDisplay: string;
   answer1: AnswerDetails;
   answer2: AnswerDetails;
-  answer3: AnswerDetails;
-  answer4: AnswerDetails;
 }
 
 function calculateAnswerDetails(
@@ -252,30 +253,50 @@ export function calculateArabicPower(
     throw new Error('الرجاء إدخال أحرف عربية صحيحة');
   }
 
-  // Step 1: Natural count (1, 2, 3...)
+  // الخطوة 1: العد الطبيعي (1, 2, 3...)
   const step1 = normalizedChars.map((_, i) => i + 1);
 
-  // Step 2: Multiply by 4
+  // الخطوة 2: الضرب في 4
   const step2 = step1.map(v => v * 4);
-  const maxStep2 = step2[n - 1] || (n * 4); // max value (r2)
-  const d2Val = n >= 2 ? step2[n - 2] : step2[0]; // d2 value
+  const lastStep2Val = step2[n - 1]; // قيمة الحرف الأخير في خطوة 2
 
-  // Step 3 & 4: Calculate reference numerical values & cell fractions
-  // Default transferred indices: By default, 100% of all generated cells are selected
+  // الخطوة 3: القسمة على الحرف الأخير ثم الضرب في نفس الخانة
+  // (step2[i] / lastStep2Val) * step2[i]
+  const step3Fractions: Fraction[] = step2.map(
+    val => new Fraction(val * val, lastStep2Val)
+  );
+
+  // الخطوة 4: جمع القيم طبيعي من خطوة 3 (تجميع تدريجي)
+  // الخانة الأولى تبقى كما هي، والخانة الثانية وما بعدها تجمع الخانة الأخيرة مع الخانات الأخرى
+  const step4Fractions: Fraction[] = Array(n);
+  if (n === 1) {
+    step4Fractions[0] = step3Fractions[0];
+  } else {
+    step4Fractions[0] = step3Fractions[0];
+    let sumNonFirst = new Fraction(0, 1);
+    for (let j = 1; j < n; j++) {
+      sumNonFirst = sumNonFirst.add(step3Fractions[j]);
+    }
+    for (let i = 1; i < n; i++) {
+      step4Fractions[i] = sumNonFirst;
+    }
+  }
+
+  // الخطوة 5: استخلاص النسب المئوية والضرب في القيمة العددية
+  // نسبة الخانة من خطوة 3 بالنسبة للحرف الأخير (step3 / lastStep2Val) * step4Val
   const defaultTransferred = transferredIndicesInput ?? step1.map((_, i) => i);
 
   const section1: Section1Item[] = normalizedChars.map((c, idx) => {
     const s1 = step1[idx];
     const s2 = step2[idx];
+    const s3Frac = step3Fractions[idx];
+    const s4Frac = step4Fractions[idx];
 
-    // Step 3 numerical value: pos 1 uses s2 directly, pos >= 2 uses (r2 + d2)
-    const s3 = idx === 0 ? s2 : (maxStep2 + d2Val);
+    // Ratio = s3Frac / lastStep2Val
+    const ratioFraction = s3Frac.div(new Fraction(lastStep2Val, 1));
 
-    // Ratio: s2 / maxStep2
-    const ratioFraction = new Fraction(s2, maxStep2);
-
-    // Result Fraction: s3 * ratioFraction
-    const resultFraction = new Fraction(s3, 1).mul(ratioFraction);
+    // Result Fraction = ratioFraction * s4Frac
+    const resultFraction = ratioFraction.mul(s4Frac);
 
     const isTransferred = defaultTransferred.includes(idx);
 
@@ -284,7 +305,10 @@ export function calculateArabicPower(
       char: c,
       step1Val: s1,
       step2Val: s2,
-      step3Val: s3,
+      step3Fraction: s3Frac,
+      step3Display: s3Frac.toString(),
+      step4Fraction: s4Frac,
+      step4Display: s4Frac.toString(),
       ratioFraction,
       ratioDisplay: ratioFraction.toString(),
       resultFraction,
@@ -293,7 +317,7 @@ export function calculateArabicPower(
     };
   });
 
-  // Calculate transferred sum fraction from selected section 1 items
+  // حساب مجموع الخانات المحددة S والعدد N
   const transferredItems = section1.filter(item => item.isTransferred);
   const count = transferredItems.length;
 
@@ -308,44 +332,34 @@ export function calculateArabicPower(
   const transferredSumDisplay = S.toString();
   const N = count;
 
-  // Transferred items formula string (e.g., "20/1 + 40/3")
+  // صيغة جمع الخانات المحددة (مثال: 208/27 + 4/27)
   const itemsFormula = count > 0
     ? transferredItems.map(item => item.resultDisplay).reverse().join(' + ')
     : '0';
 
-  // Answer 1: Direct transferred sum S (الجواب الأول)
+  // الجواب الأول 🟨
+  // 1. جمع الخانات S
+  // 2. الجذر التربيعي √S
+  // 3. الناتج العشري بـ 10 أرقام بعد العلامة
+  // 4. اختزال الناتج إلى رقم واحد
   const answer1 = calculateAnswerDetails(
     'الجواب الأول 🟨',
-    'مجموع الخانات المحددة (S)',
-    `${itemsFormula} = ${S.toString()}`,
-    S,
-    false
-  );
-
-  // Answer 2: Square root of transferred sum √S (الجواب الثاني)
-  const answer2 = calculateAnswerDetails(
-    'الجواب الثاني 🟨',
-    'الجذر التربيعي للمجموع (√S)',
-    `√(${S.toString()})`,
+    'الجذر التربيعي لمجموع الخانات المحددة (√S)',
+    `S = ${itemsFormula} = ${S.toString()}`,
     S,
     true
   );
 
-  // Answer 3: Transferred sum divided by selected count N (S / N) (الجواب الثالث)
+  // الجواب الثاني 🟨
+  // 1. جمع الخانات وقسمتها على العدد (S ÷ N)
+  // 2. الجذر التربيعي √(S ÷ N)
+  // 3. الناتج العشري بـ 10 أرقام بعد العلامة
+  // 4. اختزال الناتج إلى رقم واحد
   const sDivN = count > 0 ? S.div(new Fraction(count, 1)) : new Fraction(0, 1);
-  const answer3 = calculateAnswerDetails(
-    'الجواب الثالث 🟨',
-    `قسمة المجموع على عدد الخانات المحددة (S ÷ ${N})`,
+  const answer2 = calculateAnswerDetails(
+    'الجواب الثاني 🟨',
+    `الجذر التربيعي لـ (المجموع ÷ عدد الخانات المحددة N)`,
     `${S.toString()} ÷ ${N} = ${sDivN.toString()}`,
-    sDivN,
-    false
-  );
-
-  // Answer 4: Square root of (Transferred sum divided by selected count N) √(S / N) (الجواب الرابع)
-  const answer4 = calculateAnswerDetails(
-    'الجواب الرابع 🟨',
-    `الجذر التربيعي لـ (المجموع ÷ الخانات المحددة N)`,
-    `√(${S.toString()} ÷ ${N}) = √(${sDivN.toString()})`,
     sDivN,
     true
   );
@@ -360,8 +374,7 @@ export function calculateArabicPower(
     transferredSumDisplay,
     answer1,
     answer2,
-    answer3,
-    answer4,
   };
 }
+
 

@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalculationResult, AnswerDetails } from '@/lib/calculate';
-import { Trophy, Sparkles, Check, Divide, Calculator, CheckSquare, Square, ListFilter } from 'lucide-react';
+import { Trophy, Sparkles, Check, Calculator, CheckSquare, Square, ListFilter, ArrowLeftRight } from 'lucide-react';
 
 interface ResultViewProps {
   result: CalculationResult | null;
@@ -35,47 +35,61 @@ export default function ResultView({
   ) => {
     return (
       <Card className={`glass overflow-hidden border-${borderColor} shadow-[0_0_30px_${glowColor}] relative transition-all duration-500 hover:scale-[1.01]`}>
-        <CardHeader className="text-center pb-2">
+        <CardHeader className="text-center pb-2 border-b border-white/10">
           <div className="flex items-center justify-center gap-2 mb-1">
             {icon}
-            <span className={`text-xs font-black uppercase tracking-wider ${badgeColor}`}>
+            <span className={`text-base font-black uppercase tracking-wider ${badgeColor}`}>
               {answer.title}
             </span>
           </div>
-          <CardTitle className="text-sm font-bold text-slate-200">{answer.subtitle}</CardTitle>
+          <CardTitle className="text-sm font-bold text-slate-300">{answer.subtitle}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4 pt-2">
-          <div className="text-center p-4 bg-white/5 rounded-2xl border border-white/10">
-            <span className="text-xs text-slate-300 font-bold block mb-1 font-mono dir-ltr text-center">
+        <CardContent className="space-y-5 pt-4">
+          {/* Step 1: Formula & Fractions */}
+          <div className="p-4 bg-white/5 rounded-2xl border border-white/10 space-y-2">
+            <span className="text-xs text-slate-400 font-medium block">
+              1. جمع الخانات المحددة:
+            </span>
+            <div className="text-sm font-mono text-cyan-300 font-bold dir-ltr text-center bg-black/40 p-2 rounded-xl border border-white/5">
               {answer.exactFormula}
+            </div>
+            <div className="flex justify-between items-center pt-2">
+              <span className="text-xs text-slate-400">2. الجذر التربيعي للكسر:</span>
+              <span className={`text-2xl font-black ${badgeColor} font-mono dir-ltr`}>
+                {answer.exactFraction}
+              </span>
+            </div>
+          </div>
+
+          {/* Step 3: Decimal 10 digits */}
+          <div className="p-4 bg-emerald-950/20 rounded-2xl border border-emerald-500/30 space-y-1 text-center">
+            <span className="text-xs text-emerald-300 font-bold block mb-1">
+              3. الناتج العشري (أول 10 أرقام فقط بعد العلامة العشرية بدون تقريب):
             </span>
-            <span className={`text-3xl font-black ${badgeColor} block font-mono mb-2`}>
-              {answer.exactFraction}
-            </span>
-            <div className="inline-block bg-black/60 py-1.5 px-4 rounded-xl border border-white/10">
-              <span className="text-xs text-slate-400 block mb-0.5 font-sans">النتيجة بـ 10 أرقام عشرية:</span>
-              <span className="text-base font-bold text-emerald-400 font-mono tracking-wider">
+            <div className="inline-block bg-black/80 px-4 py-2 rounded-xl border border-emerald-500/40">
+              <span className="text-xl font-black text-emerald-400 font-mono tracking-widest dir-ltr">
                 {answer.fullDisplay10}
               </span>
             </div>
           </div>
 
-          <div className="space-y-2 text-xs bg-white/[0.02] p-4 rounded-xl border border-white/5">
-            <div className="flex justify-between items-center">
-              <span className="text-slate-400">أول 10 أرقام بعد العلامة:</span>
-              <span className={`font-mono font-bold ${badgeColor} tracking-widest`}>
+          {/* Step 4: Digit Sum Reduction */}
+          <div className="space-y-3 bg-white/[0.02] p-4 rounded-2xl border border-white/10">
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-slate-400">أول 10 أرقام المستخرجة:</span>
+              <span className={`font-mono font-bold ${badgeColor} tracking-widest text-sm dir-ltr`}>
                 {answer.first10Digits || '0000000000'}
               </span>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-slate-400">خطوات الاختزال:</span>
-              <span className={`font-mono ${badgeColor} font-bold`}>
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-slate-400">4. خطوات الاختزال والجمع:</span>
+              <span className={`font-mono ${badgeColor} font-bold text-sm dir-ltr`}>
                 {answer.digitSumSteps.join(' ➔ ')}
               </span>
             </div>
-            <div className="flex justify-between items-center pt-2 border-t border-white/10">
-              <span className="text-slate-200 font-bold text-sm">الناتج النهائي (رقم واحد):</span>
-              <span className={`text-2xl font-black ${badgeColor} px-4 py-1 bg-white/10 rounded-xl border border-white/20 shadow-inner`}>
+            <div className="flex justify-between items-center pt-3 border-t border-white/10">
+              <span className="text-slate-200 font-bold text-base">الناتج النهائي (اختزال رقم واحد):</span>
+              <span className={`text-3xl font-black ${badgeColor} px-5 py-1 bg-white/10 rounded-2xl border border-white/20 shadow-inner font-mono`}>
                 {answer.singleDigit}
               </span>
             </div>
@@ -89,15 +103,15 @@ export default function ResultView({
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 dir-rtl font-cairo">
       {/* SECTION 1: CELL BOXES & CONTROL CONTAINER */}
       <Card className="glass border-purple-500/30 shadow-[0_0_30px_rgba(168,85,247,0.15)]">
-        <CardHeader className="pb-3 border-b border-white/5">
+        <CardHeader className="pb-3 border-b border-white/10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <CardTitle className="text-xl font-bold text-purple-300 flex items-center gap-2">
                 <Calculator className="w-5 h-5 text-purple-400" />
-                القسم الأول: قسم الخانات والأرقام المرجعية (البوكس الموحد)
+                🔵 القسم الأول: قسم الخانات (المربع) - الحساب بدقة الكسر المطلق
               </CardTitle>
               <p className="text-xs text-slate-400">
-                جميع الخانات محددة تلقائياً 100%. يمكنك إلغاء تحديد أو تحديد أي خانة بحرية.
+                الخطوات الـ 5 الحسابية بالكسور الدقيقة بدون أي تقريب، مع أزرار الانتقال (Transfer Buttons).
               </p>
             </div>
 
@@ -137,64 +151,82 @@ export default function ResultView({
         </CardHeader>
 
         <CardContent className="space-y-6 pt-4">
-          {/* Scrollable Grid Container for Large Cell Numbers (1000+ support) */}
-          <div className="max-h-[480px] overflow-y-auto pr-1 pl-1 scrollbar-thin scrollbar-thumb-purple-600/40 scrollbar-track-white/5 rounded-2xl bg-slate-950/40 p-3 border border-white/10">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {/* Scrollable Grid Container for Cell Boxes */}
+          <div className="max-h-[550px] overflow-y-auto pr-1 pl-1 scrollbar-thin scrollbar-thumb-purple-600/40 scrollbar-track-white/5 rounded-2xl bg-slate-950/40 p-3 border border-white/10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {result.section1.map((item, idx) => (
                 <div
                   key={idx}
-                  onClick={() => onToggleTransfer?.(idx)}
-                  className={`p-3.5 rounded-xl border transition-all duration-300 relative cursor-pointer flex flex-col justify-between ${
+                  className={`p-4 rounded-2xl border transition-all duration-300 relative flex flex-col justify-between space-y-3 ${
                     item.isTransferred
                       ? 'bg-emerald-950/30 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/30'
-                      : 'bg-white/5 border-white/10 hover:border-white/20 hover:bg-white/[0.07]'
+                      : 'bg-white/5 border-white/10 hover:border-white/20'
                   }`}
                 >
-                  <div>
-                    <div className="flex justify-between items-center mb-2.5">
-                      <span className="text-[11px] font-bold text-slate-400 bg-white/5 px-2 py-0.5 rounded-md">
-                        الخانة {item.pos}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl font-black text-purple-300 bg-purple-500/10 px-2.5 py-0.5 rounded-lg border border-purple-500/20">
-                          {item.char}
-                        </span>
-                        <div className={`w-5 h-5 rounded flex items-center justify-center border transition-colors ${
-                          item.isTransferred ? 'bg-emerald-500 border-emerald-400 text-slate-950' : 'border-slate-500 bg-white/5'
-                        }`}>
-                          {item.isTransferred && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1 text-xs text-slate-300 mb-3 bg-black/40 p-2.5 rounded-lg border border-white/5 font-mono">
-                      <div className="flex justify-between">
-                        <span className="text-slate-400 font-sans">× 4:</span>
-                        <span className="text-cyan-300 font-bold">{item.step2Val}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-400 font-sans">مرجعي:</span>
-                        <span className="text-yellow-300 font-bold">{item.step3Val}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-400 font-sans">النسبة:</span>
-                        <span className="text-purple-300 font-bold">{item.ratioDisplay}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t border-white/10 flex items-center justify-between">
-                    <span className="text-[11px] text-slate-400">قيمة الخانة:</span>
-                    <span className="text-lg font-black text-emerald-400 font-mono">
-                      {item.resultDisplay}
+                  {/* Header: Pos & Char */}
+                  <div className="flex justify-between items-center border-b border-white/10 pb-2">
+                    <span className="text-xs font-bold text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg">
+                      الخانة {item.pos}
                     </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl font-black text-purple-300 bg-purple-500/10 px-3 py-0.5 rounded-xl border border-purple-500/20">
+                        {item.char}
+                      </span>
+                    </div>
                   </div>
+
+                  {/* 5 Detailed Steps Breakdown */}
+                  <div className="space-y-1.5 text-xs text-slate-300 bg-black/50 p-3 rounded-xl border border-white/5 font-mono">
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-400 font-sans">1. العد الطبيعي:</span>
+                      <span className="text-white font-bold">{item.step1Val}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-400 font-sans">2. الضرب في 4:</span>
+                      <span className="text-cyan-300 font-bold">{item.step2Val}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-400 font-sans">3. قسمة × ضرب:</span>
+                      <span className="text-yellow-300 font-bold dir-ltr">{item.step3Display}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-400 font-sans">4. التجميع الطبيعي:</span>
+                      <span className="text-purple-300 font-bold dir-ltr">{item.step4Display}</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-1 border-t border-white/10">
+                      <span className="text-slate-400 font-sans">5. النسبة والكسر النهائي:</span>
+                      <span className="text-emerald-400 font-black text-sm dir-ltr">{item.resultDisplay}</span>
+                    </div>
+                  </div>
+
+                  {/* Transfer Button (زر الانتقال) */}
+                  <button
+                    onClick={() => onToggleTransfer?.(idx)}
+                    className={`w-full py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-between transition-all duration-300 shadow-md ${
+                      item.isTransferred
+                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-500 hover:to-teal-500 shadow-emerald-950/40'
+                        : 'bg-white/10 text-slate-400 hover:bg-white/20 hover:text-white border border-white/10'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <ArrowLeftRight className="w-3.5 h-3.5" />
+                      <span>زر انتقال ({item.char})</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="font-mono dir-ltr text-xs">{item.resultDisplay}</span>
+                      <div className={`w-4 h-4 rounded flex items-center justify-center border ${
+                        item.isTransferred ? 'bg-white text-emerald-950 border-white' : 'border-slate-500'
+                      }`}>
+                        {item.isTransferred && <Check className="w-3 h-3 stroke-[3]" />}
+                      </div>
+                    </div>
+                  </button>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Selected Items Summary Box (شريط استعراض الخانات المحددة) */}
+          {/* Selected Items Summary Box (صندوق استعراض الخانات المحددة) */}
           <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-purple-950/40 to-blue-950/40 border border-emerald-500/30 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
               <div className="flex items-center gap-3">
@@ -203,34 +235,34 @@ export default function ResultView({
                 </div>
                 <div>
                   <span className="text-xs text-emerald-300 font-bold block">
-                    صندوق استعراض الخانات المحددة (Selected Items Summary)
+                    صندوق الخانات المنتقلة (Selected Cells Summary)
                   </span>
                   <span className="text-xs text-slate-400">
-                    العدد المحدد ($N$): <strong className="text-white font-mono">{transferredCount}</strong> | المجموع ($S$): <strong className="text-emerald-400 font-mono">{result.transferredSumDisplay}</strong>
+                    عدد الخانات المحددة ($N$): <strong className="text-white font-mono">{transferredCount}</strong> | المجموع الكسري ($S$): <strong className="text-emerald-400 font-mono dir-ltr">{result.transferredSumDisplay}</strong>
                   </span>
                 </div>
               </div>
-              <div className="px-4 py-1.5 bg-emerald-500/20 rounded-xl border border-emerald-500/30 font-mono text-base font-black text-emerald-300 text-center">
+              <div className="px-4 py-1.5 bg-emerald-500/20 rounded-xl border border-emerald-500/30 font-mono text-base font-black text-emerald-300 text-center dir-ltr">
                 S = {result.transferredSumDisplay}
               </div>
             </div>
 
             {/* List of Selected Characters and values */}
             <div className="text-xs font-mono text-slate-300 bg-black/50 p-3 rounded-xl border border-white/5 overflow-x-auto">
-              <span className="text-slate-400 font-sans block mb-1">تفاصيل الخانات المحددة حالياً:</span>
+              <span className="text-slate-400 font-sans block mb-1">تفاصيل الخانات المنتقلة:</span>
               {transferredCount > 0 ? (
                 <div className="flex flex-wrap gap-2 items-center">
                   {transferredItems.map((item, i) => (
-                    <span key={i} className="inline-flex items-center gap-1 bg-white/10 px-2.5 py-1 rounded-lg border border-white/10 text-emerald-300">
+                    <span key={i} className="inline-flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-lg border border-white/10 text-emerald-300">
                       <span className="font-bold text-white font-sans">{item.char}</span>
                       <span className="text-slate-400 text-[10px]">({item.pos}):</span>
-                      <span>{item.resultDisplay}</span>
+                      <span className="dir-ltr">{item.resultDisplay}</span>
                     </span>
                   ))}
                 </div>
               ) : (
                 <span className="text-amber-400/80 font-sans text-xs">
-                  لم يتم تحديد أي خانة. يرجى تحديد خانة واحدة على الأقل لإجراء الحسابات.
+                  لم يتم نقل/تحديد أي خانة. انقر على [زر انتقال] لنقل الخانات المطلوب حسابها.
                 </span>
               )}
             </div>
@@ -238,11 +270,11 @@ export default function ResultView({
         </CardContent>
       </Card>
 
-      {/* SECTION 2: 4 ANSWERS SECTION (الأبواب الأربعة) */}
+      {/* SECTION 2: 2 ANSWERS SECTION (قسم النتائج - الجواب الأول والجواب الثاني) */}
       <div className="space-y-4">
         <h3 className="text-xl font-bold text-slate-200 flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-yellow-400" />
-          القسم الثاني: شاشة النتائج والأجوبة الأربعة (Results Section)
+          🟨 القسم الثاني: قسم النتائج (الجواب الأول والجواب الثاني)
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -252,7 +284,7 @@ export default function ResultView({
             'text-yellow-400',
             'yellow-500/30',
             'rgba(245,158,11,0.15)',
-            <Trophy className="w-5 h-5 text-yellow-400" />
+            <Trophy className="w-6 h-6 text-yellow-400" />
           )}
 
           {/* Answer 2 */}
@@ -261,28 +293,11 @@ export default function ResultView({
             'text-cyan-400',
             'cyan-500/30',
             'rgba(6,182,212,0.15)',
-            <Sparkles className="w-5 h-5 text-cyan-400" />
-          )}
-
-          {/* Answer 3 */}
-          {renderAnswerCard(
-            result.answer3,
-            'text-orange-400',
-            'orange-500/30',
-            'rgba(249,115,22,0.15)',
-            <Divide className="w-5 h-5 text-orange-400" />
-          )}
-
-          {/* Answer 4 */}
-          {renderAnswerCard(
-            result.answer4,
-            'text-emerald-400',
-            'emerald-500/30',
-            'rgba(16,185,129,0.15)',
-            <Sparkles className="w-5 h-5 text-emerald-400" />
+            <Sparkles className="w-6 h-6 text-cyan-400" />
           )}
         </div>
       </div>
     </div>
   );
 }
+
