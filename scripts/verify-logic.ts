@@ -30,6 +30,32 @@ try {
         process.exit(1);
     }
 
+    // Test 1B: Verification for paper sample "سلس" with all cells selected
+    const resultSals = calculateArabicPower("سلس");
+    console.log(`\n--- TEST 1B: Paper Sample ("${resultSals.original}", all selected: "س", "ل", "س") ---`);
+    console.log(`Normalized: [${resultSals.normalizedChars.join(', ')}]`);
+    console.log(`Cell 1 (س): ${resultSals.section1[0].resultDisplay}`);
+    console.log(`Cell 2 (ل): ${resultSals.section1[1].resultDisplay}`);
+    console.log(`Cell 3 (س): ${resultSals.section1[2].resultDisplay}`);
+    console.log(`Transferred Sum S: ${resultSals.transferredSumDisplay}`);
+    console.log(`Answer 1 (√S)    : ${resultSals.answer1.fullDisplay10} | Formula: ${resultSals.answer1.exactFormula} | Digit Sum: ${resultSals.answer1.digitSumSteps.join('->')} => ${resultSals.answer1.singleDigit}`);
+    console.log(`Answer 2 (√(S/N)): ${resultSals.answer2.fullDisplay10} | Formula: ${resultSals.answer2.exactFormula} | Digit Sum: ${resultSals.answer2.digitSumSteps.join('->')} => ${resultSals.answer2.singleDigit}`);
+
+    const isSalsCell1Valid = resultSals.section1[0].resultDisplay === "40/27";
+    const isSalsCell2Valid = resultSals.section1[1].resultDisplay === "64/27";
+    const isSalsCell3Valid = resultSals.section1[2].resultDisplay === "40/3";
+    const isSalsSumValid = resultSals.transferredSumDisplay === "464/27";
+
+    const isSalsAns1Valid = resultSals.answer1.fullDisplay10 === "4.1455018013" && resultSals.answer1.singleDigit === 1;
+    const isSalsAns2Valid = resultSals.answer2.fullDisplay10 === "2.3934065809" && resultSals.answer2.singleDigit === 2;
+
+    if (isSalsCell1Valid && isSalsCell2Valid && isSalsCell3Valid && isSalsSumValid && isSalsAns1Valid && isSalsAns2Valid) {
+        console.log("✅ TEST 1B PASSED: Perfectly matches handwritten paper solution for 'سلس'!");
+    } else {
+        console.error("❌ TEST 1B FAILED!");
+        process.exit(1);
+    }
+
     // Test 2: Large Article Test (1000+ characters)
     const largeText = "بسم الله الرحمن الرحيم ".repeat(50);
     const resultLarge = calculateArabicPower(largeText);

@@ -266,21 +266,25 @@ export function calculateArabicPower(
     val => new Fraction(val * val, lastStep2Val)
   );
 
-  // الخطوة 4: جمع القيم طبيعي من خطوة 3 (تجميع تدريجي)
-  // الخانة الأولى تبقى كما هي، والخانة الثانية وما بعدها تجمع الخانة الأخيرة مع الخانات الأخرى
-  const step4Fractions: Fraction[] = Array(n);
-  if (n === 1) {
-    step4Fractions[0] = step3Fractions[0];
-  } else {
-    step4Fractions[0] = step3Fractions[0];
-    let sumNonFirst = new Fraction(0, 1);
-    for (let j = 1; j < n; j++) {
-      sumNonFirst = sumNonFirst.add(step3Fractions[j]);
-    }
-    for (let i = 1; i < n; i++) {
-      step4Fractions[i] = sumNonFirst;
+  // الخطوة 4: التجميع الطبيعي للخانات بناءً على الحرف الأول والحروف الأخرى
+  // - الخانات التي تماثل حرف الخانة الأولى (C1) تجمع قيم الخطوة 3 لجميع الخانات المماثلة لـ C1.
+  // - الخانات في المواضع 2..N التي تختلف عن C1 تجمع قيم الخطوة 3 لجميع الخانات المختلفة عن C1 في المواضع 2..N.
+  const firstChar = normalizedChars[0];
+
+  let sumFirstCharGroup = new Fraction(0, 1);
+  let sumOtherCharsGroup = new Fraction(0, 1);
+
+  for (let i = 0; i < n; i++) {
+    if (normalizedChars[i] === firstChar) {
+      sumFirstCharGroup = sumFirstCharGroup.add(step3Fractions[i]);
+    } else {
+      sumOtherCharsGroup = sumOtherCharsGroup.add(step3Fractions[i]);
     }
   }
+
+  const step4Fractions: Fraction[] = normalizedChars.map(c =>
+    c === firstChar ? sumFirstCharGroup : sumOtherCharsGroup
+  );
 
   // الخطوة 5: استخلاص النسب المئوية والضرب في القيمة العددية
   // نسبة الخانة من خطوة 3 بالنسبة للحرف الأخير (step3 / lastStep2Val) * step4Val
