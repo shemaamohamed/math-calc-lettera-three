@@ -266,24 +266,17 @@ export function calculateArabicPower(
     val => new Fraction(val * val, lastStep2Val)
   );
 
-  // الخطوة 4: التجميع الطبيعي للخانات بناءً على الحرف الأول والحروف الأخرى
-  // - الخانات التي تماثل حرف الخانة الأولى (C1) تجمع قيم الخطوة 3 لجميع الخانات المماثلة لـ C1.
-  // - الخانات في المواضع 2..N التي تختلف عن C1 تجمع قيم الخطوة 3 لجميع الخانات المختلفة عن C1 في المواضع 2..N.
-  const firstChar = normalizedChars[0];
-
-  let sumFirstCharGroup = new Fraction(0, 1);
-  let sumOtherCharsGroup = new Fraction(0, 1);
+  // الخطوة 4: تجميع قيم الخطوة 3 لكل حرف أبجدي (تجميع الخانات المماثلة لكل حرف)
+  const charStep3Sums = new Map<string, Fraction>();
 
   for (let i = 0; i < n; i++) {
-    if (normalizedChars[i] === firstChar) {
-      sumFirstCharGroup = sumFirstCharGroup.add(step3Fractions[i]);
-    } else {
-      sumOtherCharsGroup = sumOtherCharsGroup.add(step3Fractions[i]);
-    }
+    const c = normalizedChars[i];
+    const currentSum = charStep3Sums.get(c) ?? new Fraction(0, 1);
+    charStep3Sums.set(c, currentSum.add(step3Fractions[i]));
   }
 
   const step4Fractions: Fraction[] = normalizedChars.map(c =>
-    c === firstChar ? sumFirstCharGroup : sumOtherCharsGroup
+    charStep3Sums.get(c)!
   );
 
   // الخطوة 5: استخلاص النسب المئوية والضرب في القيمة العددية
