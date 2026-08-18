@@ -46,6 +46,7 @@ export default function ArabicInput({ value, onChange }: ArabicInputProps) {
                     placeholder="اكتب النص العربي هنا للتفكيك..."
                     className="relative min-h-[160px] text-2xl font-bold bg-white/[0.02] border-white/5 focus:border-purple-500/50 text-white placeholder:text-slate-600 rounded-2xl p-6 transition-all duration-300 focus:bg-white/[0.04] resize-none leading-relaxed"
                     dir="rtl"
+                    spellCheck={false}
                 />
             </div>
 

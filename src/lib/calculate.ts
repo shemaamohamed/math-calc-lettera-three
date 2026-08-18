@@ -316,13 +316,14 @@ export function calculateArabicPower(
   });
 
   // حساب مجموع الخانات المحددة S والعدد N
+  // S = مجموع قيم الخطوة 3 (step3Fraction) للخانات المحددة
   const transferredItems = section1.filter(item => item.isTransferred);
   const count = transferredItems.length;
 
   let S = new Fraction(0, 1);
   if (count > 0) {
     S = transferredItems.reduce(
-      (acc, item) => acc.add(item.resultFraction),
+      (acc, item) => acc.add(item.step3Fraction),
       new Fraction(0, 1)
     );
   }
@@ -330,9 +331,9 @@ export function calculateArabicPower(
   const transferredSumDisplay = S.toString();
   const N = count;
 
-  // صيغة جمع الخانات المحددة (مثال: 208/27 + 4/27)
+  // صيغة جمع الخانات المحددة (مثال: 40/3 + 64/27 + 40/27)
   const itemsFormula = count > 0
-    ? transferredItems.map(item => item.resultDisplay).reverse().join(' + ')
+    ? transferredItems.map(item => item.step3Display).reverse().join(' + ')
     : '0';
 
   // الجواب الأول 🟨
