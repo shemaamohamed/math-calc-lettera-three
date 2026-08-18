@@ -12,7 +12,7 @@ export const NORMALIZATION_MAP: Record<string, string> = {
   'ء': 'أ',
   'ى': 'أ',
   'ا': 'أ',
-  'ة': 'ت',
+  'ة': 'ه',
   'ه': 'ه',
 };
 
@@ -46,11 +46,11 @@ export function validateArabicInput(text: string): boolean {
 }
 
 /**
- * Clean text by removing diacritics (tashkeel)
+ * Clean text by removing diacritics (tashkeel) and tatweel
  * @param text - Input text
  * @returns Cleaned text
  */
 export function removeDiacritics(text: string): string {
-  // Remove Arabic diacritics (U+064B to U+0652)
-  return text.replace(/[\u064B-\u0652]/g, '');
+  // Remove Arabic diacritics (U+064B to U+0652) and Tatweel (U+0640)
+  return text.replace(/[\u064B-\u0652\u0640]/g, '');
 }

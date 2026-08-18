@@ -9,9 +9,9 @@ const TEN = BigInt(10);
 const HUNDRED = BigInt(100);
 
 function normalizeChar(ch: string): string {
-  if (['ا', 'أ', 'إ', 'آ', 'ٱ', 'ء', 'ئ', 'ؤ'].includes(ch)) return 'أ';
-  if (['ت', 'ة'].includes(ch)) return 'ت';
-  if (['ه', 'ۥ'].includes(ch)) return 'ه';
+  if (['ا', 'أ', 'إ', 'آ', 'ٱ', 'ء', 'ئ', 'ؤ', 'ى'].includes(ch)) return 'أ';
+  if (['ت'].includes(ch)) return 'ت';
+  if (['ه', 'ة', 'ۥ'].includes(ch)) return 'ه';
   return ch;
 }
 
@@ -245,7 +245,8 @@ export function calculateArabicPower(
   text: string,
   transferredIndicesInput?: number[]
 ): CalculationResult {
-  const rawChars = text.split('').filter(c => c.trim() !== '');
+  const cleanedText = text.replace(/[\u064B-\u0652\u0640]/g, '');
+  const rawChars = cleanedText.split('').filter(c => c.trim() !== '');
   const normalizedChars = rawChars.map(normalizeChar);
   const n = normalizedChars.length;
 

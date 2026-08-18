@@ -4,9 +4,9 @@ const fs = require('fs');
  * Arabic Character Normalization according to User Rules
  */
 function normalizeChar(ch) {
-    if (['ا', 'أ', 'إ', 'آ', 'ٱ', 'ء', 'ئ', 'ؤ'].includes(ch)) return 'أ';
-    if (['ت', 'ة'].includes(ch)) return 'ت';
-    if (['ه', 'ۥ'].includes(ch)) return 'ه';
+    if (['ا', 'أ', 'إ', 'آ', 'ٱ', 'ء', 'ئ', 'ؤ', 'ى'].includes(ch)) return 'أ';
+    if (['ت'].includes(ch)) return 'ت';
+    if (['ه', 'ة', 'ۥ'].includes(ch)) return 'ه';
     return ch;
 }
 
@@ -114,7 +114,8 @@ function reduceToSingleDigit(fracPart) {
  * Main Calculator Execution Function (3 Steps)
  */
 function processWord(text) {
-    const rawChars = text.split('').filter(c => c.trim() !== '');
+    const cleanText = text.replace(/[\u064B-\u0652\u0640]/g, '');
+    const rawChars = cleanText.split('').filter(c => c.trim() !== '');
     const chars = rawChars.map(normalizeChar);
     const n = chars.length;
     if (n === 0) return { error: "Empty input text" };

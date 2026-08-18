@@ -68,6 +68,25 @@ try {
         process.exit(1);
     }
 
+    // Test 3: Normalization rules check for ى, ة, and هـ
+    const resultNorm = calculateArabicPower("هدى مدرسة هـ");
+    console.log(`\n--- TEST 3: Character Normalization ("هدى مدرسة هـ") ---`);
+    console.log(`Normalized: [${resultNorm.normalizedChars.join(', ')}]`);
+
+    // "هدى" -> ه, د, أ (ى converted to أ)
+    // "مدرسة" -> م, د, ر, س, ه (ة converted to ه)
+    // "هـ" -> ه (tatweel removed, ه kept)
+    const isAlefMaqsuraValid = resultNorm.normalizedChars[2] === 'أ';
+    const isTaMarbutaValid = resultNorm.normalizedChars[7] === 'ه';
+    const isTatweelStrippedValid = !resultNorm.normalizedChars.includes('ـ');
+
+    if (isAlefMaqsuraValid && isTaMarbutaValid && isTatweelStrippedValid) {
+        console.log("✅ TEST 3 PASSED: ى correctly mapped to أ, ة correctly mapped to ه, tatweel correctly stripped!");
+    } else {
+        console.error("❌ TEST 3 FAILED! Norm chars:", resultNorm.normalizedChars);
+        process.exit(1);
+    }
+
     console.log("\n==================================================");
     console.log("🎉 ALL TESTS COMPLETED SUCCESSFULLY!");
     console.log("==================================================");
