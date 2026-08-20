@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-cairo: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
+  --font-cairo: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   
   --color-purple-premium: oklch(0.6 0.25 300);
   --color-blue-premium: oklch(0.6 0.2 250);

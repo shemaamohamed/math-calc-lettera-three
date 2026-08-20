@@ -5,8 +5,8 @@ const fs = require('fs');
  */
 function normalizeChar(ch) {
     if (['ا', 'أ', 'إ', 'آ', 'ٱ', 'ء', 'ئ', 'ؤ', 'ى'].includes(ch)) return 'أ';
-    if (['ت'].includes(ch)) return 'ت';
-    if (['ه', 'ة', 'ۥ'].includes(ch)) return 'ه';
+    if (['ت', 'ة'].includes(ch)) return 'ت';
+    if (['ه', 'ۥ'].includes(ch)) return 'ه';
     return ch;
 }
 

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { calculateArabicPower, CalculationResult } from '@/lib/calculate';
 import { useRouter } from 'next/navigation';
-import { Sparkles, LogOut, Calculator } from 'lucide-react';
+import { Sparkles, LogOut, Calculator, Zap } from 'lucide-react';
 
 function HomePage() {
   const [text, setText] = useState('');
@@ -41,7 +41,7 @@ function HomePage() {
       } finally {
         setIsCalculating(false);
       }
-    }, 200);
+    }, 150);
   };
 
   const handleToggleTransfer = (index: number) => {
@@ -92,101 +92,98 @@ function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 relative overflow-hidden font-cairo selection:bg-purple-500/30">
-      {/* Dynamic Background */}
+    <div className="min-h-screen bg-slate-950 text-slate-50 relative overflow-x-hidden font-cairo selection:bg-purple-500/30">
+      {/* Dynamic Ambient Background */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-600/20 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-600/20 rounded-full blur-[120px] animate-pulse delay-1000" />
-        <div className="absolute top-[30%] left-[20%] w-[30%] h-[30%] bg-pink-600/10 rounded-full blur-[100px] animate-pulse delay-500" />
+        <div className="absolute top-[-10%] right-[-10%] w-[45%] h-[45%] bg-purple-600/15 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[45%] h-[45%] bg-blue-600/15 rounded-full blur-[120px] animate-pulse delay-1000" />
       </div>
 
-      <div className="container mx-auto px-4 py-12 max-w-6xl relative z-10">
-        {/* Navigation Bar */}
-        <header className="flex justify-between items-center mb-16 animate-in fade-in slide-in-from-top-4 duration-700">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
-              <Sparkles className="w-7 h-7 text-white" />
+      <div className="container mx-auto px-3 sm:px-6 py-4 sm:py-6 max-w-7xl relative z-10">
+        {/* Compact Navigation Bar */}
+        <header className="flex justify-between items-center mb-4 sm:mb-6 animate-in fade-in slide-in-from-top-3 duration-500">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center shadow-md shadow-purple-500/20">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-black bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent uppercase tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-white via-purple-200 to-slate-400 bg-clip-text text-transparent uppercase tracking-tight">
                 القوة العربية
               </h1>
-              <p className="text-xs text-slate-500 font-medium tracking-widest uppercase">Ancient Wisdom • Modern Code</p>
+              <p className="text-[9px] sm:text-[10px] text-slate-400 font-medium tracking-wider">
+                نظام الحساب الرياضي الدقيق (Arbitrary-Precision)
+              </p>
             </div>
           </div>
           <Button
             variant="ghost"
             onClick={handleLogout}
-            className="text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-300 rounded-xl px-6"
+            className="text-slate-400 hover:text-white hover:bg-white/5 transition-all rounded-lg px-3 py-1.5 text-xs h-auto"
           >
             تسجيل الخروج
-            <LogOut className="w-4 h-4 mr-2" />
+            <LogOut className="w-3.5 h-3.5 mr-1.5" />
           </Button>
         </header>
 
-        <main className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <main className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
           {/* Left Column: Input */}
-          <section className="lg:col-span-5 space-y-8 animate-in fade-in slide-in-from-right-8 duration-1000">
-            <div className="space-y-4">
-              <h2 className="text-4xl font-bold leading-tight">كبّر كلماتك وقِس <span className="text-purple-400">قوتها الرقمية</span></h2>
-              <p className="text-slate-400 text-lg leading-relaxed">
-                استخدم خوارزميتنا المتقدمة لتحليل النصوص العربية وتفكيكها إلى عناصرها الأولية، وحساب قيمتها الرقمية المختزلة.
-              </p>
-            </div>
-
-            <Card className="glass border-white/5 shadow-2xl overflow-hidden">
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                  <Calculator className="w-5 h-5 text-purple-400" />
-                  <CardTitle className="text-lg">لوحة الإدخال</CardTitle>
+          <section className="lg:col-span-4 space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
+            <Card className="glass border-white/10 shadow-xl overflow-hidden">
+              <CardHeader className="py-3 px-4 border-b border-white/5 bg-white/[0.01]">
+                <div className="flex items-center gap-2">
+                  <Calculator className="w-4 h-4 text-purple-400" />
+                  <CardTitle className="text-sm font-bold text-slate-200">لوحة الإدخال والتحليل</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <ArabicInput value={text} onChange={(val) => {
-                  setText(val);
-                  setTransferredIndices(undefined);
-                }} />
+              <CardContent className="p-4 space-y-4">
+                <ArabicInput
+                  value={text}
+                  onChange={val => {
+                    setText(val);
+                    setTransferredIndices(undefined);
+                  }}
+                />
 
                 {error && (
-                  <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl animate-in shake-x duration-500">
-                    <p className="text-red-400 text-sm font-medium text-center">{error}</p>
+                  <div className="p-2.5 bg-red-500/10 border border-red-500/20 rounded-xl animate-in shake-x duration-300">
+                    <p className="text-red-400 text-xs font-medium text-center">{error}</p>
                   </div>
                 )}
 
                 <Button
                   onClick={() => handleCalculate()}
-                  className="w-full h-14 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold text-lg rounded-2xl shadow-xl shadow-purple-900/40 transition-all duration-500 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30 group"
+                  className="w-full h-11 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-purple-900/30 transition-all duration-300 transform hover:scale-[1.01] active:scale-[0.99] disabled:opacity-30 group"
                   disabled={!text.trim() || isCalculating}
                 >
                   {isCalculating ? (
-                    <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>جاري معالجة البيانات...</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>جاري الحساب...</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <span>بدء الحساب الرقمي</span>
-                      <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                      <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                     </div>
                   )}
                 </Button>
               </CardContent>
             </Card>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                <div className="text-2xl font-bold text-white mb-1">١٠٠٪</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">دقة الحساب</div>
+            <div className="grid grid-cols-2 gap-2.5 text-center">
+              <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
+                <div className="text-lg font-black text-purple-300">١٠٠٪</div>
+                <div className="text-[10px] text-slate-400 font-semibold uppercase">دقة كسرية دقيقة</div>
               </div>
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                <div className="text-2xl font-bold text-white mb-1">لحظي</div>
-                <div className="text-xs text-slate-500 font-semibold uppercase">سرعة المعالجة</div>
+              <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5">
+                <div className="text-lg font-black text-emerald-400">لحظي</div>
+                <div className="text-[10px] text-slate-400 font-semibold uppercase">تنقل سريع بدون تمرير</div>
               </div>
             </div>
           </section>
 
           {/* Right Column: Results */}
-          <section className="lg:col-span-7 animate-in fade-in slide-in-from-left-8 duration-1000 delay-300">
+          <section className="lg:col-span-8 animate-in fade-in slide-in-from-left-4 duration-500">
             {result ? (
               <ResultView
                 result={result}
@@ -195,18 +192,23 @@ function HomePage() {
                 onDeselectAll={handleDeselectAll}
               />
             ) : (
-              <div className="h-full min-h-[400px] rounded-3xl border-2 border-dashed border-white/5 flex flex-col items-center justify-center text-slate-600 gap-6 group">
-                <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 group-hover:bg-white/10 transition-all duration-500">
-                  <Calculator className="w-10 h-10 opacity-20" />
+              <div className="h-full min-h-[360px] rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center text-slate-500 gap-4 group p-6 bg-slate-900/20">
+                <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center group-hover:scale-105 group-hover:bg-white/10 transition-all duration-300 border border-white/5">
+                  <Calculator className="w-7 h-7 text-purple-400/50" />
                 </div>
-                <p className="text-center text-lg max-w-xs font-medium">أدخل نصاً في جهة اليمين لرؤية التحليل التفصيلي هنا</p>
+                <div className="text-center space-y-1 max-w-xs">
+                  <p className="text-slate-300 text-sm font-bold">بانتظار إدخال النص</p>
+                  <p className="text-slate-500 text-xs">
+                    اكتب أو الصق أي نص عربي في لوحة الإدخال لرؤية جدول التحليل المدمج وشريط التنقل السريع.
+                  </p>
+                </div>
               </div>
             )}
           </section>
         </main>
 
-        <footer className="mt-24 pt-8 border-t border-white/5 text-center text-slate-600 text-sm">
-          <p>© {new Date().getFullYear()} مشروع القوة العربية • تم التصميم بأحدث التقنيات</p>
+        <footer className="mt-8 pt-4 border-t border-white/5 text-center text-slate-600 text-xs">
+          <p>© {new Date().getFullYear()} مشروع القوة العربية • تم التصميم لتجربة فائقة السرعة والمدمجة</p>
         </footer>
       </div>
     </div>
@@ -220,4 +222,3 @@ export default function Home() {
     </ProtectedRoute>
   );
 }
-

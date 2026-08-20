@@ -12,7 +12,7 @@ export const NORMALIZATION_MAP: Record<string, string> = {
   'ء': 'أ',
   'ى': 'أ',
   'ا': 'أ',
-  'ة': 'ه',
+  'ة': 'ت',
   'ه': 'ه',
 };
 

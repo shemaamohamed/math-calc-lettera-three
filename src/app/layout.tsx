@@ -1,17 +1,9 @@
 import type { Metadata } from "next";
-import { Cairo } from "next/font/google";
 import "./globals.css";
 
-const cairo = Cairo({
-  subsets: ["arabic", "latin"],
-  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-cairo",
-  display: "swap",
-});
-
 export const metadata: Metadata = {
-  title: "القوة العربية - Arabic Power",
-  description: "حساب القوة الرقمية للنصوص العربية",
+  title: "القوة العربية - Arabic Power Calculator",
+  description: "حساب القوة الرقمية للنصوص العربية بدقة الكسر المطلق",
 };
 
 export default function RootLayout({
@@ -21,7 +13,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl">
-      <body className={`${cairo.variable} font-cairo antialiased`}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+      </head>
+      <body className="font-cairo antialiased">
         {children}
       </body>
     </html>
