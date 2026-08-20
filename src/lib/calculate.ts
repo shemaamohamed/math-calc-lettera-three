@@ -1,6 +1,5 @@
 /**
  * Arabic Arbitrary-Precision Math Calculation Library (3-Step Version)
- * مكتبة الحساب الرقمي الدقيق للغة العربية (نظام الخطوات الثلاث)
  */
 
 const ZERO = BigInt(0);
@@ -9,14 +8,14 @@ const TWO = BigInt(2);
 const TEN = BigInt(10);
 const HUNDRED = BigInt(100);
 
-export function normalizeChar(ch: string): string {
+function normalizeChar(ch: string): string {
   if (['ا', 'أ', 'إ', 'آ', 'ٱ', 'ء', 'ئ', 'ؤ', 'ى'].includes(ch)) return 'أ';
-  if (['ت', 'ة'].includes(ch)) return 'ت';
-  if (['ه', 'ۥ'].includes(ch)) return 'ه';
+  if (['ت'].includes(ch)) return 'ت';
+  if (['ه', 'ة', 'ۥ'].includes(ch)) return 'ه';
   return ch;
 }
 
-export function gcd(a: bigint, b: bigint): bigint {
+function gcd(a: bigint, b: bigint): bigint {
   while (b !== ZERO) {
     const t = b;
     b = a % b;
@@ -25,7 +24,7 @@ export function gcd(a: bigint, b: bigint): bigint {
   return a < ZERO ? -a : a;
 }
 
-export function bigIntSqrt(n: bigint): bigint {
+function bigIntSqrt(n: bigint): bigint {
   if (n < ZERO) throw new Error('Square root of negative number');
   if (n === ZERO) return ZERO;
   let x0 = n;
@@ -167,12 +166,15 @@ export function reduceToSingleDigit(fracPart: string): DigitSumResult {
 export interface Section1Item {
   pos: number;
   char: string;
-  originalChar: string;
   step1Val: number;
   step2Val: number;
-  percentageFraction: Fraction;
-  percentageDisplay: string;
-  termFraction: Fraction;
+  step3Fraction: Fraction;
+  step3Display: string;
+  step4Fraction: Fraction;
+  step4Display: string;
+  ratioFraction: Fraction;
+  ratioDisplay: string;
+  resultFraction: Fraction;
   resultDisplay: string;
   isTransferred: boolean;
 }
@@ -243,7 +245,6 @@ export function calculateArabicPower(
   text: string,
   transferredIndicesInput?: number[]
 ): CalculationResult {
-  // تنظيف علامات التشكيل والتطويل
   const cleanedText = text.replace(/[\u064B-\u0652\u0640]/g, '');
   const rawChars = cleanedText.split('').filter(c => c.trim() !== '');
   const normalizedChars = rawChars.map(normalizeChar);
@@ -253,45 +254,63 @@ export function calculateArabicPower(
     throw new Error('الرجاء إدخال أحرف عربية صحيحة');
   }
 
-  // الخطوة 1: العد الطبيعي للمواقع (1, 2, 3, ..., n)
-  const step1Pos = normalizedChars.map((_, i) => i + 1);
+  // الخطوة 1: العد الطبيعي (1, 2, 3...)
+  const step1 = normalizedChars.map((_, i) => i + 1);
 
-  // الخطوة 2: جمع القيم طبيعي من الخطوة 1 لكل حرف موحد
-  const step2Map = new Map<string, number>();
-  normalizedChars.forEach((c, idx) => {
-    step2Map.set(c, (step2Map.get(c) || 0) + step1Pos[idx]);
-  });
+  // الخطوة 2: الضرب في 4
+  const step2 = step1.map(v => v * 4);
+  const lastStep2Val = step2[n - 1]; // قيمة الحرف الأخير في خطوة 2
 
-  // الخطوة 3: استخلاص النسب المئوية وضربها في قيمة الخطوة 2
-  const defaultTransferred = transferredIndicesInput ?? step1Pos.map((_, i) => i);
+  // الخطوة 3: القسمة على الحرف الأخير ثم الضرب في نفس الخانة
+  // (step2[i] / lastStep2Val) * step2[i]
+  const step3Fractions: Fraction[] = step2.map(
+    val => new Fraction(val * val, lastStep2Val)
+  );
+
+  // الخطوة 4: تجميع قيم الخطوة 3 لكل حرف أبجدي (تجميع الخانات المماثلة لكل حرف)
+  const charStep3Sums = new Map<string, Fraction>();
+
+  for (let i = 0; i < n; i++) {
+    const c = normalizedChars[i];
+    const currentSum = charStep3Sums.get(c) ?? new Fraction(0, 1);
+    charStep3Sums.set(c, currentSum.add(step3Fractions[i]));
+  }
+
+  const step4Fractions: Fraction[] = normalizedChars.map(c =>
+    charStep3Sums.get(c)!
+  );
+
+  // الخطوة 5: استخلاص النسب المئوية والضرب في القيمة العددية
+  // نسبة الخانة من خطوة 3 بالنسبة للحرف الأخير (step3 / lastStep2Val) * step4Val
+  const defaultTransferred = transferredIndicesInput ?? step1.map((_, i) => i);
 
   const section1: Section1Item[] = normalizedChars.map((c, idx) => {
-    const pos = step1Pos[idx];
-    const originalChar = rawChars[idx];
-    const letterStep2Val = step2Map.get(c)!;
+    const s1 = step1[idx];
+    const s2 = step2[idx];
+    const s3Frac = step3Fractions[idx];
+    const s4Frac = step4Fractions[idx];
 
-    // النسبة المئوية ككسر مبسط
-    const pctFraction = new Fraction(BigInt(pos), BigInt(n));
-    // النسبة المئوية بالنسبة المئوية (مثل 25/1%)
-    const pct100Fraction = pctFraction.mul(new Fraction(100, 1));
-    const percentageDisplay = `${pct100Fraction.toString()}% (${pctFraction.toString()})`;
+    // Ratio = s3Frac / lastStep2Val
+    const ratioFraction = s3Frac.div(new Fraction(lastStep2Val, 1));
 
-    // الناتج الجزئي (Term Fraction) = النسبة المئوية * قيمة مجموع الحرف من خطوة 2
-    const termFraction = pctFraction.mul(new Fraction(BigInt(letterStep2Val), 1));
-    const resultDisplay = termFraction.toString();
+    // Result Fraction = ratioFraction * s4Frac
+    const resultFraction = ratioFraction.mul(s4Frac);
 
     const isTransferred = defaultTransferred.includes(idx);
 
     return {
-      pos,
+      pos: idx + 1,
       char: c,
-      originalChar,
-      step1Val: pos,
-      step2Val: letterStep2Val,
-      percentageFraction: pctFraction,
-      percentageDisplay,
-      termFraction,
-      resultDisplay,
+      step1Val: s1,
+      step2Val: s2,
+      step3Fraction: s3Frac,
+      step3Display: s3Frac.toString(),
+      step4Fraction: s4Frac,
+      step4Display: s4Frac.toString(),
+      ratioFraction,
+      ratioDisplay: ratioFraction.toString(),
+      resultFraction,
+      resultDisplay: resultFraction.toString(),
       isTransferred,
     };
   });
@@ -303,7 +322,7 @@ export function calculateArabicPower(
   let S = new Fraction(0, 1);
   if (count > 0) {
     S = transferredItems.reduce(
-      (acc, item) => acc.add(item.termFraction),
+      (acc, item) => acc.add(item.resultFraction),
       new Fraction(0, 1)
     );
   }
@@ -311,13 +330,16 @@ export function calculateArabicPower(
   const transferredSumDisplay = S.toString();
   const N = count;
 
-  // صيغة جمع الخانات المحددة
+  // صيغة جمع الخانات المحددة (مثال: 208/27 + 4/27)
   const itemsFormula = count > 0
-    ? transferredItems.map(item => item.resultDisplay).join(' + ')
+    ? transferredItems.map(item => item.resultDisplay).reverse().join(' + ')
     : '0';
 
   // الجواب الأول 🟨
-  // الجذر التربيعي لمجموع الخانات المحددة (√S)
+  // 1. جمع الخانات S
+  // 2. الجذر التربيعي √S
+  // 3. الناتج العشري بـ 10 أرقام بعد العلامة
+  // 4. اختزال الناتج إلى رقم واحد
   const answer1 = calculateAnswerDetails(
     'الجواب الأول 🟨',
     'الجذر التربيعي لمجموع الخانات المحددة (√S)',
@@ -327,7 +349,10 @@ export function calculateArabicPower(
   );
 
   // الجواب الثاني 🟨
-  // الجذر التربيعي لـ (المجموع S ÷ عدد الخانات المحددة N)
+  // 1. جمع الخانات وقسمتها على العدد (S ÷ N)
+  // 2. الجذر التربيعي √(S ÷ N)
+  // 3. الناتج العشري بـ 10 أرقام بعد العلامة
+  // 4. اختزال الناتج إلى رقم واحد
   const sDivN = count > 0 ? S.div(new Fraction(count, 1)) : new Fraction(0, 1);
   const answer2 = calculateAnswerDetails(
     'الجواب الثاني 🟨',
@@ -349,3 +374,5 @@ export function calculateArabicPower(
     answer2,
   };
 }
+
+
