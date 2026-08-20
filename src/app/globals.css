@@ -33,10 +33,19 @@
 }
 
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     font-family: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: clip;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
